@@ -11,7 +11,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
 
@@ -22,6 +22,11 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    volumes:
+      - ./configs/grafana/datasource/all.yml:/etc/grafana/provisioning/datasources/all.yml
+      - ./configs/grafana/dashboards/dash-config.yml:/etc/grafana/provisioning/dashboards/dash-config.yml
+      - ./configs/grafana/dashboards/boards:/var/lib/grafana/dashboards
+
     ports:
     - 3000:3000
 
