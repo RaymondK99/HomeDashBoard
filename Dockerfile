@@ -1,4 +1,6 @@
-FROM openjdk:13-alpine
+#FROM openjdk:13-alpine
+FROM bellsoft/liberica-openjdk-alpine
+
 EXPOSE 8080
 
 ## Add nice to haves

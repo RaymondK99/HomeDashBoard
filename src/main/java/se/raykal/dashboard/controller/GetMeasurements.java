@@ -25,10 +25,10 @@ public class GetMeasurements {
     MeasurementService measurementService;
 
     @CrossOrigin
-    @RequestMapping(method = RequestMethod.GET, value = "/temp", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/temp/", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getTemperature() {
 
         LOGGER.debug("Fetch measurements");
-        return Double.toString(measurementService.getTemp());
+        return Double.toString(measurementService.getTempAttic());
     }
 }
