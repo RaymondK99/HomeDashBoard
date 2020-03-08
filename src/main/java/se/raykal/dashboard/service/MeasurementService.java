@@ -2,18 +2,29 @@ package se.raykal.dashboard.service;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 @Service
 public class MeasurementService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementService.class);
 
     @Autowired
     MeterRegistry meterRegistry;
+
+    Map<String, Function> sensorMap = new HashMap();
+
+    private static interface  Function {
+        double getValue();
+    }
 
     @PostConstruct
     private void init() {
@@ -32,7 +43,26 @@ public class MeasurementService {
                 .register(meterRegistry);
 
 
+        sensorMap.put("temp-attic", () -> getTempAttic());
+        sensorMap.put("temp-basement", () -> getTempBasement());
+        sensorMap.put("humid-attic", () -> getHumidityAttic());
+        sensorMap.put("humid-basement", () -> getHumitidyBasement());
     }
+
+
+    public double getTemperature(String sensorName) {
+
+        Function function = sensorMap.get(sensorName);
+
+        if (function == null) {
+            LOGGER.warn("Sensor: " + sensorName + " is not available.");
+            throw new RuntimeException("Sensor is not available.");
+        }
+
+        return function.getValue();
+
+    }
+
 
     private double randHumidity() {
         Random rand = new Random();
@@ -48,11 +78,11 @@ public class MeasurementService {
         return Double.parseDouble(base + "." + decimal);
     }
 
-    public double getHumidityAttic() {
+    private double getHumidityAttic() {
         return randHumidity();
     }
 
-    public double getHumitidyBasement() {
+    private double getHumitidyBasement() {
         return randHumidity();
     }
 
