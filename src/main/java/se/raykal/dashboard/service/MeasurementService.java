@@ -30,7 +30,7 @@ public class MeasurementService {
     @Value("${random_values:false}")
     private boolean randomValues;
 
-    @Value("${dht22_file_path:/tmp/dht22.out}")
+    @Value("${dht22_file_path:/tmp_host/dht22.out}")
     private String dhtFilePath;
 
     private static interface  Function {

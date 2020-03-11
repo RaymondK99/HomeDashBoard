@@ -6,7 +6,7 @@ services:
     build: .
     image: dashboard:latest
     volumes:
-      - /tmp/dht22.out:/tmp/dht22.out
+      - /tmp/:/tmp_host/
     ports:
     - 8080
 
