@@ -5,6 +5,8 @@ services:
   dash-backend:
     build: .
     image: dashboard:latest
+    volumes:
+      - /tmp/dht22.out:/tmp/dht22.out
     ports:
     - 8080
 
