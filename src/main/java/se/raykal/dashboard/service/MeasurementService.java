@@ -119,9 +119,10 @@ public class MeasurementService {
             try {
                 Scanner scanner = new Scanner(myObj);
                 double temp = scanner.nextDouble();
-                double humidity=  scanner.nextDouble();
+                double humidity =  scanner.nextDouble();
+                long timeStamp = scanner.nextLong();
 
-                LOGGER.debug("Read values from file: {},{}", temp, humidity);
+                LOGGER.info("Read values from file: temp={}, humidity={}, timestamp={}", temp, humidity, timeStamp);
 
                 return new double[] {temp, humidity};
             } catch (IOException exc) {

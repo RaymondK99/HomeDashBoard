@@ -9,7 +9,7 @@ def read_loop():
 
         # write to file
         out_file = open("/tmp/dht22.out","w+")
-        out_file.write("%.1f %.1f" % (temperature, humidity))
+        out_file.write("%.1f %.1f %d" % (temperature, humidity, int(time.time())))
         out_file.close()
 
         # Sleep some
