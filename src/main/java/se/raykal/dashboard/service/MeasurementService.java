@@ -12,10 +12,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 @Service
 public class MeasurementService {
@@ -33,6 +30,8 @@ public class MeasurementService {
     @Value("${dht22_file_path:/tmp_host/dht22.out}")
     private String dhtFilePath;
 
+    private long timeStamp;
+
     private static interface  Function {
         double getValue();
     }
@@ -47,6 +46,10 @@ public class MeasurementService {
         //        .register(meterRegistry);
 
         Gauge gaugeHum1 = Gauge.builder("humidity.value",this, MeasurementService::getHumitidyBasement).tag("location","basement")
+                .register(meterRegistry);
+
+
+        Gauge gaugeSampleRead = Gauge.builder("sample.timestamp",this, MeasurementService::getDateTime).tag("location","basement")
                 .register(meterRegistry);
 
 
@@ -74,6 +77,9 @@ public class MeasurementService {
 
     }
 
+    public long getDateTime() {
+        return timeStamp;
+    }
 
     private double randHumidity() {
         Random rand = new Random();
@@ -120,7 +126,7 @@ public class MeasurementService {
                 Scanner scanner = new Scanner(myObj);
                 double temp = scanner.nextDouble();
                 double humidity =  scanner.nextDouble();
-                long timeStamp = scanner.nextLong();
+                this.timeStamp = scanner.nextLong();
 
                 LOGGER.info("Read values from file: temp={}, humidity={}, timestamp={}", temp, humidity, timeStamp);
 
