@@ -12,6 +12,9 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.size=500MB'
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
