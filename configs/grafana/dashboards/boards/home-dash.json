@@ -15,6 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -58,7 +59,6 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.6.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -82,14 +82,16 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sample_timestamp",
+          "expr": "sample_sequence_number",
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
       "thresholds": "",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Sample timestamp",
+      "title": "Sample sequence number",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -302,5 +304,8 @@
   "timezone": "",
   "title": "Home dashboard",
   "uid": "jZ-A86lZk",
+  "variables": {
+    "list": []
+  },
   "version": 1
 }

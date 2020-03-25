@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
 import java.util.*;
 
@@ -30,7 +29,7 @@ public class MeasurementService {
     @Value("${dht22_file_path:/tmp_host/dht22.out}")
     private String dhtFilePath;
 
-    private long timeStamp;
+    private long sampleSequenceNumber;
 
     private static interface  Function {
         double getValue();
@@ -38,29 +37,25 @@ public class MeasurementService {
 
     @PostConstruct
     private void init() {
-        Gauge gaugeTemp1 = Gauge.builder("temp.value",this, MeasurementService::getTempBasement).tag("location","basement")
+        final String locationFoundationTag = "foundation";
+        final String locationTagName = "location";
+        Gauge gaugeTemp1 = Gauge.builder("temp.value",this, MeasurementService::getTempFoundation).tag(locationTagName, locationFoundationTag)
+                .register(meterRegistry);
+
+        
+        Gauge gaugeHum1 = Gauge.builder("humidity.value",this, MeasurementService::getHumitidyFoundation).tag(locationTagName, locationFoundationTag)
                 .register(meterRegistry);
 
 
-        //Gauge gaugeTemp2 = Gauge.builder("temp.value",this, MeasurementService::getTempAttic).tag("location","attic")
-        //        .register(meterRegistry);
-
-        Gauge gaugeHum1 = Gauge.builder("humidity.value",this, MeasurementService::getHumitidyBasement).tag("location","basement")
+        Gauge gaugeSampleRead = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumber).tag(locationTagName, locationFoundationTag)
                 .register(meterRegistry);
 
-
-        Gauge gaugeSampleRead = Gauge.builder("sample.timestamp",this, MeasurementService::getDateTime).tag("location","basement")
-                .register(meterRegistry);
-
-
-       // Gauge gaugeHum2 = Gauge.builder("humidity.value",this, MeasurementService::getHumidityAttic).tag("location","attic")
-       //         .register(meterRegistry);
 
 
         sensorMap.put("temp-attic", () -> getTempAttic());
-        sensorMap.put("temp-basement", () -> getTempBasement());
+        sensorMap.put("temp-foundation", () -> getTempFoundation());
         sensorMap.put("humid-attic", () -> getHumidityAttic());
-        sensorMap.put("humid-basement", () -> getHumitidyBasement());
+        sensorMap.put("humid-foundation", () -> getHumitidyFoundation());
     }
 
 
@@ -77,8 +72,8 @@ public class MeasurementService {
 
     }
 
-    public long getDateTime() {
-        return timeStamp;
+    public long getSampleSequenceNumber() {
+        return sampleSequenceNumber;
     }
 
     private double randHumidity() {
@@ -99,7 +94,7 @@ public class MeasurementService {
         return randHumidity();
     }
 
-    private double getHumitidyBasement() {
+    private double getHumitidyFoundation() {
         if (randomValues) return randHumidity();
 
         double[] values =  readFile();
@@ -110,7 +105,7 @@ public class MeasurementService {
         return randTemp();
     }
 
-    public double getTempBasement() {
+    public double getTempFoundation() {
         if (randomValues) return randTemp();
 
         double[] values =  readFile();
@@ -126,9 +121,10 @@ public class MeasurementService {
                 Scanner scanner = new Scanner(myObj);
                 double temp = scanner.nextDouble();
                 double humidity =  scanner.nextDouble();
-                this.timeStamp = scanner.nextLong();
+                this.sampleSequenceNumber = scanner.nextLong();
 
-                LOGGER.info("Read values from file: temp={}, humidity={}, timestamp={}", temp, humidity, timeStamp);
+                LOGGER.info("Read values from file: temp={}, humidity={}, timestamp={}", temp, humidity,
+                        sampleSequenceNumber);
 
                 return new double[] {temp, humidity};
             } catch (IOException exc) {
