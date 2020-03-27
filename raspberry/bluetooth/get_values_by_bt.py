@@ -5,10 +5,10 @@ port = serial.Serial("/dev/rfcomm0", baudrate=9600,timeout=1)
 # reading and writing data from and to arduino serially.                                      
 # rfcomm0 -> this could be different
 while True:
-	#print "--> Write '1' to arduino bluetooth device"
-	#port.write(str(1))
+	time.sleep(1)
 
         try:
+           port.write("read\n");
            rcv = port.readline()
 	   if rcv:
 	      print("<-- Read from Arduino:" + rcv)
