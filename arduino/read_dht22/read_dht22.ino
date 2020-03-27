@@ -19,7 +19,7 @@ DHT_Unified dht(DHTPIN, DHTTYPE);
 uint32_t delayMS;
 
 unsigned int sample_number = 1;
-char buffer[100];
+
 
 void setup() {
   Serial.begin(9600);
@@ -52,15 +52,11 @@ void setup() {
   delayMS = sensor.min_delay / 1000;
 }
 
-void loop() {
-  // Go in LowPower mode
-  // ATmega328P, ATmega168
-  //LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, 
-  //              SPI_OFF, USART0_OFF, TWI_OFF);
-  // Delay between measurements.
-  delay(2000);
+
+void print_measurements() {
+  char buffer[100];
   
-  // Get temperature event and print its value.
+   // Get temperature event and print its value.
   sensors_event_t temp_event, humid_event;
 
   // Read temp
@@ -84,5 +80,29 @@ void loop() {
     Serial.println(buffer);
   }
   
+}
+void loop() {
+  
+  char buffer[100] = {0};
 
+  // Delay is by default 1000ms
+  int bytes_read = Serial.readBytes(buffer, 100);
+  if (bytes_read > 0) {
+      if (!strcmp(buffer,"READ\n") || !strcmp(buffer,"read\n")) {
+        print_measurements();
+      } else if (!strcmp(buffer,"PING\n") || !strcmp(buffer,"ping\n")) {
+          Serial.print("PING\n");
+      } else if ( !strcmp(buffer,"SAMPLE_NUMBER\n") || !strcmp(buffer,"sample_number\n")) {
+          char tmp[20];
+          sprintf(tmp, "%u",sample_number);
+          Serial.println(tmp);
+      } else if ( !strcmp(buffer,"MILLIS\n") || !strcmp(buffer,"millis\n")) {
+          Serial.println(millis());
+      } else {
+         // Uknown command...
+         char tmp[50]={0};
+         snprintf(tmp,50,"Uknown command:%s",buffer);
+         Serial.println(tmp);
+      }
+  }
 }
