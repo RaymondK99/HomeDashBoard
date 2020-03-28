@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -59,6 +59,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "pluginVersion": "6.6.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -101,7 +102,7 @@
           "value": "null"
         }
       ],
-      "valueName": "avg"
+      "valueName": "current"
     },
     {
       "aliasColors": {},
@@ -284,7 +285,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {
@@ -304,8 +305,5 @@
   "timezone": "",
   "title": "Home dashboard",
   "uid": "jZ-A86lZk",
-  "variables": {
-    "list": []
-  },
   "version": 1
 }
