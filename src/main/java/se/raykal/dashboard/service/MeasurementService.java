@@ -27,13 +27,13 @@ public class MeasurementService {
     private boolean randomValues;
 
     @Value("${dht22_file_path_foundation:/tmp_host/dht22_foundation.out}")
-    private String meaurementsFoundation;
+    private String measurementsFoundation;
 
     @Value("${dht22_file_path_living_room:/tmp_host/dht22_living_room.out}")
-    private String meaurementsLivingRoom;
+    private String measurementsLivingRoom;
 
 
-    private long sampleSequenceNumber;
+    private Map<String,Long> sampleSequenceNumberMap = new HashMap<>();
 
     private static interface  Function {
         double getValue();
@@ -58,11 +58,11 @@ public class MeasurementService {
         Gauge gaugeHum2 = Gauge.builder("humidity.value",this, MeasurementService::getHumidityLivingRoom).tag(locationTagName, locationLivingRoom)
                 .register(meterRegistry);
 
-        Gauge gaugeSampleRead = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumber).tag(locationTagName, locationFoundationTag)
+        Gauge gaugeSampleRead = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumberFoundation).tag(locationTagName, locationFoundationTag)
                 .register(meterRegistry);
 
 
-        Gauge gaugeSampleRead2 = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumber).tag(locationTagName, locationLivingRoom)
+        Gauge gaugeSampleRead2 = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumberLivingRoom).tag(locationTagName, locationLivingRoom)
                 .register(meterRegistry);
 
 
@@ -87,8 +87,13 @@ public class MeasurementService {
 
     }
 
-    public long getSampleSequenceNumber() {
-        return sampleSequenceNumber;
+    public long getSampleSequenceNumberLivingRoom() {
+        return sampleSequenceNumberMap.get(this.measurementsLivingRoom);
+    }
+
+
+    public long getSampleSequenceNumberFoundation() {
+        return sampleSequenceNumberMap.get(this.measurementsFoundation);
     }
 
     private double randHumidity() {
@@ -116,7 +121,7 @@ public class MeasurementService {
     private double getHumidityLivingRoom() {
         if (randomValues) return randHumidity();
 
-        double[] values =  readFile(this.meaurementsLivingRoom);
+        double[] values =  readFile(this.measurementsLivingRoom);
         return values[1];
     }
 
@@ -125,14 +130,14 @@ public class MeasurementService {
     public double getTempLivingRoom() {
         if (randomValues) return randTemp();
 
-        double[] values =  readFile(this.meaurementsLivingRoom);
+        double[] values =  readFile(this.measurementsLivingRoom);
         return values[0];
     }
 
     private double getHumidityFoundation() {
         if (randomValues) return randHumidity();
 
-        double[] values =  readFile(this.meaurementsFoundation);
+        double[] values =  readFile(this.measurementsFoundation);
         return values[1];
     }
 
@@ -141,7 +146,7 @@ public class MeasurementService {
     public double getTempFoundation() {
         if (randomValues) return randTemp();
 
-        double[] values =  readFile(this.meaurementsFoundation);
+        double[] values =  readFile(this.measurementsFoundation);
         return values[0];
     }
 
@@ -154,17 +159,19 @@ public class MeasurementService {
                 Scanner scanner = new Scanner(myObj);
                 double temp = scanner.nextDouble();
                 double humidity =  scanner.nextDouble();
-                this.sampleSequenceNumber = scanner.nextLong();
+                long sampleSequenceNumber = scanner.nextLong();
 
-                LOGGER.info("Read values from file '{}': temp={}, humidity={}, timestamp={}", filePath, temp, humidity,
+                this.sampleSequenceNumberMap.put(filePath, sampleSequenceNumber);
+
+                LOGGER.info("Read values from file {}: temp={}, humidity={}, timestamp={}", filePath, temp, humidity,
                         sampleSequenceNumber);
 
                 return new double[] {temp, humidity};
             } catch (IOException exc) {
-                LOGGER.error("Unable to open file:" + meaurementsFoundation + ", error:" + meaurementsFoundation);
+                LOGGER.error("Unable to open file:" + measurementsFoundation + ", error:" + measurementsFoundation);
             }
         } else {
-            LOGGER.error("Unable to locate file:" + meaurementsFoundation);
+            LOGGER.error("Unable to locate file:" + measurementsFoundation);
         }
 
         return new double[] {0,0};
