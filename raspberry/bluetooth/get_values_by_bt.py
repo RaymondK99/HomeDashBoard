@@ -13,7 +13,7 @@ while True:
               rcv = port.readline()
 	      if rcv:
 	         print("From Arduino read:" + rcv)
-                 out_file = open("/tmp/dht22.out","w+")
+                 out_file = open("/tmp/dht22_foundation.out","w+")
                  out_file.write(rcv)
                  out_file.close()
               else:

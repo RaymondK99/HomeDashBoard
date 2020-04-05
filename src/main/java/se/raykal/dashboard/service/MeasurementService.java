@@ -26,8 +26,12 @@ public class MeasurementService {
     @Value("${random_values:false}")
     private boolean randomValues;
 
-    @Value("${dht22_file_path:/tmp_host/dht22.out}")
-    private String dhtFilePath;
+    @Value("${dht22_file_path_foundation:/tmp_host/dht22_foundation.out}")
+    private String meaurementsFoundation;
+
+    @Value("${dht22_file_path_living_room:/tmp_host/dht22_living_room.out}")
+    private String meaurementsLivingRoom;
+
 
     private long sampleSequenceNumber;
 
@@ -38,16 +42,27 @@ public class MeasurementService {
     @PostConstruct
     private void init() {
         final String locationFoundationTag = "foundation";
+        final String locationLivingRoom = "living room";
         final String locationTagName = "location";
         Gauge gaugeTemp1 = Gauge.builder("temp.value",this, MeasurementService::getTempFoundation).tag(locationTagName, locationFoundationTag)
                 .register(meterRegistry);
 
         
-        Gauge gaugeHum1 = Gauge.builder("humidity.value",this, MeasurementService::getHumitidyFoundation).tag(locationTagName, locationFoundationTag)
+        Gauge gaugeHum1 = Gauge.builder("humidity.value",this, MeasurementService::getHumidityFoundation).tag(locationTagName, locationFoundationTag)
+                .register(meterRegistry);
+
+        Gauge gaugeTemp2 = Gauge.builder("temp.value",this, MeasurementService::getTempLivingRoom).tag(locationTagName, locationLivingRoom)
                 .register(meterRegistry);
 
 
+        Gauge gaugeHum2 = Gauge.builder("humidity.value",this, MeasurementService::getHumidityLivingRoom).tag(locationTagName, locationLivingRoom)
+                .register(meterRegistry);
+
         Gauge gaugeSampleRead = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumber).tag(locationTagName, locationFoundationTag)
+                .register(meterRegistry);
+
+
+        Gauge gaugeSampleRead2 = Gauge.builder("sample.sequence_number",this, MeasurementService::getSampleSequenceNumber).tag(locationTagName, locationLivingRoom)
                 .register(meterRegistry);
 
 
@@ -55,7 +70,7 @@ public class MeasurementService {
         sensorMap.put("temp-attic", () -> getTempAttic());
         sensorMap.put("temp-foundation", () -> getTempFoundation());
         sensorMap.put("humid-attic", () -> getHumidityAttic());
-        sensorMap.put("humid-foundation", () -> getHumitidyFoundation());
+        sensorMap.put("humid-foundation", () -> getHumidityFoundation());
     }
 
 
@@ -94,27 +109,45 @@ public class MeasurementService {
         return randHumidity();
     }
 
-    private double getHumitidyFoundation() {
-        if (randomValues) return randHumidity();
-
-        double[] values =  readFile();
-        return values[1];
-    }
-
     public double getTempAttic() {
         return randTemp();
     }
 
+    private double getHumidityLivingRoom() {
+        if (randomValues) return randHumidity();
+
+        double[] values =  readFile(this.meaurementsLivingRoom);
+        return values[1];
+    }
+
+
+
+    public double getTempLivingRoom() {
+        if (randomValues) return randTemp();
+
+        double[] values =  readFile(this.meaurementsLivingRoom);
+        return values[0];
+    }
+
+    private double getHumidityFoundation() {
+        if (randomValues) return randHumidity();
+
+        double[] values =  readFile(this.meaurementsFoundation);
+        return values[1];
+    }
+
+
+
     public double getTempFoundation() {
         if (randomValues) return randTemp();
 
-        double[] values =  readFile();
+        double[] values =  readFile(this.meaurementsFoundation);
         return values[0];
     }
 
 
-    private double[] readFile() {
-        File myObj = new File(this.dhtFilePath);
+    private double[] readFile(String filePath) {
+        File myObj = new File(filePath);
 
         if (myObj.exists()) {
             try {
@@ -128,10 +161,10 @@ public class MeasurementService {
 
                 return new double[] {temp, humidity};
             } catch (IOException exc) {
-                LOGGER.error("Unable to open file:" + dhtFilePath + ", error:" + dhtFilePath);
+                LOGGER.error("Unable to open file:" + meaurementsFoundation + ", error:" + meaurementsFoundation);
             }
         } else {
-            LOGGER.error("Unable to locate file:" + dhtFilePath);
+            LOGGER.error("Unable to locate file:" + meaurementsFoundation);
         }
 
         return new double[] {0,0};

@@ -14,7 +14,7 @@ def read_loop():
         humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
 
         # write to file
-        out_file = open("/tmp/dht22.out","w+")
+        out_file = open("/tmp/dht22_living_room.out","w+")
         out_file.write("%.1f %.1f %d\n" % (temperature, humidity, int(time.time())))
         out_file.close()
 
