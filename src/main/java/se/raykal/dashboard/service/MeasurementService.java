@@ -156,7 +156,7 @@ public class MeasurementService {
                 double humidity =  scanner.nextDouble();
                 this.sampleSequenceNumber = scanner.nextLong();
 
-                LOGGER.info("Read values from file: temp={}, humidity={}, timestamp={}", temp, humidity,
+                LOGGER.info("Read values from file '{}': temp={}, humidity={}, timestamp={}", filePath, temp, humidity,
                         sampleSequenceNumber);
 
                 return new double[] {temp, humidity};
